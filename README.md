@@ -3,11 +3,12 @@
 Manage persistent `kubectl port-forward` profiles with a sidebar UI.
 
 ## Features
-- Sidebar list of port-forward profiles
+- Activity Bar view with port-forward profiles
 - Start/stop individual profiles
 - Start/stop all profiles
 - Auto-reconnect when a forward dies
 - Config stored in `.vscode/portforward.json`
+- Status details including last exit code and last error
 
 ## Requirements
 - `kubectl` must be available on your PATH
@@ -47,6 +48,13 @@ Create `.vscode/portforward.json` in your workspace:
 ## Notes
 - Profiles are keyed by `name` (if provided), otherwise by `resource + ports`.
 - If a profile is removed from the config, its running forward is stopped.
+
+## Packaging
+- `npx @vscode/vsce package`
+- Output `.vsix` will be created in the repo root.
+
+## Publishing
+See `PUBLISHING.md` for Marketplace steps.
 
 ---
 

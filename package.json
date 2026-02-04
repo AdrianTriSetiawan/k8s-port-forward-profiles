@@ -1,15 +1,31 @@
-﻿{
+{
   "name": "k8s-port-forward-profiles",
   "displayName": "K8s Port Forward Profiles",
   "description": "Manage persistent kubectl port-forward profiles with a sidebar UI.",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "publisher": "adriantrisetiawan",
+  "icon": "media/icon.png",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AdrianTriSetiawan/k8s-port-forward-profiles.git"
+  },
+  "bugs": {
+    "url": "https://github.com/AdrianTriSetiawan/k8s-port-forward-profiles/issues"
+  },
+  "homepage": "https://github.com/AdrianTriSetiawan/k8s-port-forward-profiles#readme",
   "engines": {
     "vscode": "^1.85.0"
   },
   "categories": [
     "Kubernetes",
     "Other"
+  ],
+  "keywords": [
+    "kubernetes",
+    "kubectl",
+    "port-forward",
+    "k8s"
   ],
   "activationEvents": [
     "onView:k8sPortForwardProfiles",
@@ -25,8 +41,17 @@
   ],
   "main": "./extension.js",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "k8sPortForward",
+          "title": "K8s Forward",
+          "icon": "media/activitybar.svg"
+        }
+      ]
+    },
     "views": {
-      "explorer": [
+      "k8sPortForward": [
         {
           "id": "k8sPortForwardProfiles",
           "name": "K8s Port Forward"

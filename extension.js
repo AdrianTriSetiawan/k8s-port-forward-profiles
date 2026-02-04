@@ -67,6 +67,60 @@ function isValidProfile(profile) {
   return true;
 }
 
+function toErrorInfo(error) {
+  if (!error) {
+    return null;
+  }
+  if (typeof error === 'string') {
+    return { message: error };
+  }
+  return {
+    message: error.message ? String(error.message) : String(error)
+  };
+}
+
+function formatExitSummary(lastExit) {
+  if (!lastExit) {
+    return '';
+  }
+  if (lastExit.error && lastExit.error.message) {
+    return `error: ${lastExit.error.message}`;
+  }
+  if (Number.isFinite(lastExit.code)) {
+    return `exit ${lastExit.code}`;
+  }
+  if (lastExit.signal) {
+    return `signal ${lastExit.signal}`;
+  }
+  return '';
+}
+
+function buildTooltip(profile, status, lastExit) {
+  const lines = [];
+  lines.push(`${profile.resource} (${profile.localPort}:${profile.remotePort})`);
+  if (profile.context) {
+    lines.push(`Context: ${profile.context}`);
+  }
+  const namespaceLabel = profile.namespace ? profile.namespace : 'default';
+  lines.push(`Namespace: ${namespaceLabel}`);
+  lines.push(`Status: ${status}`);
+  if (lastExit) {
+    if (Number.isFinite(lastExit.code)) {
+      lines.push(`Last exit code: ${lastExit.code}`);
+    }
+    if (lastExit.signal) {
+      lines.push(`Last exit signal: ${lastExit.signal}`);
+    }
+    if (lastExit.error && lastExit.error.message) {
+      lines.push(`Last error: ${lastExit.error.message}`);
+    }
+    if (lastExit.at) {
+      lines.push(`Last exit time: ${lastExit.at}`);
+    }
+  }
+  return lines.join('\n');
+}
+
 class PortForwardManager {
   constructor(output, onDidChange) {
     this.output = output;
@@ -110,6 +164,11 @@ class PortForwardManager {
       });
     }
     return this.records.get(key);
+  }
+
+  getRecord(profile) {
+    const key = profileKey(profile);
+    return this.records.get(key) || null;
   }
 
   getStatus(profile) {
@@ -166,7 +225,7 @@ class PortForwardManager {
       child = cp.spawn('kubectl', args, { windowsHide: true });
     } catch (error) {
       record.status = 'error';
-      record.lastExit = { code: null, signal: null, error };
+      record.lastExit = { code: null, signal: null, error: toErrorInfo(error), at: new Date().toISOString() };
       this.output.appendLine(`Failed to spawn kubectl: ${error.message}`);
       this.onDidChange();
       return;
@@ -190,7 +249,7 @@ class PortForwardManager {
 
     child.on('exit', (code, signal) => {
       record.child = null;
-      record.lastExit = { code, signal, error: null };
+      record.lastExit = { code, signal, error: null, at: new Date().toISOString() };
 
       if (record.desired && normalized.autoReconnect) {
         record.status = 'restarting';
@@ -205,7 +264,7 @@ class PortForwardManager {
     child.on('error', (error) => {
       record.child = null;
       record.status = 'error';
-      record.lastExit = { code: null, signal: null, error };
+      record.lastExit = { code: null, signal: null, error: toErrorInfo(error), at: new Date().toISOString() };
       this.output.appendLine(`kubectl error: ${error.message}`);
       this.onDidChange();
     });
@@ -260,11 +319,18 @@ class PortForwardManager {
 }
 
 class ProfileItem extends vscode.TreeItem {
-  constructor(profile, status) {
+  constructor(profile, status, lastExit) {
     const label = profile.name || profile.resource;
     super(label, vscode.TreeItemCollapsibleState.None);
     const ns = profile.namespace ? `ns:${profile.namespace}` : 'ns:default';
-    this.description = `${profile.localPort}:${profile.remotePort} ${ns}`;
+    const statusLabel = status || 'stopped';
+    const showExitSummary = statusLabel !== 'running' && statusLabel !== 'starting';
+    const exitSummary = showExitSummary ? formatExitSummary(lastExit) : '';
+    const detailParts = [`${profile.localPort}:${profile.remotePort}`, ns, statusLabel];
+    if (exitSummary) {
+      detailParts.push(exitSummary);
+    }
+    this.description = detailParts.join(' | ');
     this.contextValue = 'k8sPortForwardProfiles.profile';
     this.command = {
       command: 'k8sPortForwardProfiles.toggleProfile',
@@ -281,7 +347,7 @@ class ProfileItem extends vscode.TreeItem {
     }[status] || 'circle-large-outline';
 
     this.iconPath = new vscode.ThemeIcon(icon);
-    this.tooltip = `${profile.resource} (${profile.localPort}:${profile.remotePort})`;
+    this.tooltip = buildTooltip(profile, statusLabel, lastExit);
   }
 }
 
@@ -390,8 +456,10 @@ class PortForwardTreeDataProvider {
 
     return items.concat(
       this.profiles.map((profile) => {
-        const status = this.manager.getStatus(profile);
-        return new ProfileItem(profile, status);
+        const record = this.manager.getRecord(profile);
+        const status = record ? record.status : 'stopped';
+        const lastExit = record ? record.lastExit : null;
+        return new ProfileItem(profile, status, lastExit);
       })
     );
   }

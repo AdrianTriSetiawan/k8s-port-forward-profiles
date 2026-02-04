@@ -1,5 +1,8 @@
 ﻿# Changelog
 
+## 0.1.2
+- Remove unsupported Marketplace category.
+
 ## 0.1.1
 - Update publisher to match Marketplace ID.
 - Refresh extension icon.

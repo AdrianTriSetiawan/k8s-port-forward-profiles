@@ -2,7 +2,7 @@
   "name": "k8s-port-forward-profiles",
   "displayName": "K8s Port Forward Profiles",
   "description": "Manage persistent kubectl port-forward profiles with a sidebar UI.",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "publisher": "AdrianTriS",
   "icon": "media/icon.png",
   "license": "MIT",
@@ -18,7 +18,6 @@
     "vscode": "^1.85.0"
   },
   "categories": [
-    "Kubernetes",
     "Other"
   ],
   "keywords": [

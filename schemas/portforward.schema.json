@@ -1,0 +1,59 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "profiles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["resource", "localPort", "remotePort"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Display name for the profile."
+          },
+          "context": {
+            "type": "string",
+            "description": "kubectl context to use."
+          },
+          "namespace": {
+            "type": "string",
+            "description": "Kubernetes namespace."
+          },
+          "resource": {
+            "type": "string",
+            "description": "Target resource (e.g. svc/api, pod/my-pod)."
+          },
+          "localPort": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 65535,
+            "description": "Local port to bind."
+          },
+          "remotePort": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 65535,
+            "description": "Remote port on the resource."
+          },
+          "localAddress": {
+            "type": "string",
+            "description": "Address to bind locally."
+          },
+          "autoStart": {
+            "type": "boolean",
+            "default": false,
+            "description": "Start automatically when VS Code opens."
+          },
+          "autoReconnect": {
+            "type": "boolean",
+            "default": true,
+            "description": "Reconnect if kubectl exits."
+          }
+        }
+      }
+    }
+  }
+}

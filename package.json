@@ -1,0 +1,132 @@
+﻿{
+  "name": "k8s-port-forward-profiles",
+  "displayName": "K8s Port Forward Profiles",
+  "description": "Manage persistent kubectl port-forward profiles with a sidebar UI.",
+  "version": "0.0.1",
+  "publisher": "adriantrisetiawan",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Kubernetes",
+    "Other"
+  ],
+  "activationEvents": [
+    "onView:k8sPortForwardProfiles",
+    "onCommand:k8sPortForwardProfiles.refresh",
+    "onCommand:k8sPortForwardProfiles.startProfile",
+    "onCommand:k8sPortForwardProfiles.stopProfile",
+    "onCommand:k8sPortForwardProfiles.restartProfile",
+    "onCommand:k8sPortForwardProfiles.startAll",
+    "onCommand:k8sPortForwardProfiles.stopAll",
+    "onCommand:k8sPortForwardProfiles.openConfig",
+    "onCommand:k8sPortForwardProfiles.createConfig",
+    "onCommand:k8sPortForwardProfiles.toggleProfile"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "views": {
+      "explorer": [
+        {
+          "id": "k8sPortForwardProfiles",
+          "name": "K8s Port Forward"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "k8sPortForwardProfiles.refresh",
+        "title": "Refresh Port Forwards"
+      },
+      {
+        "command": "k8sPortForwardProfiles.startProfile",
+        "title": "Start Port Forward"
+      },
+      {
+        "command": "k8sPortForwardProfiles.stopProfile",
+        "title": "Stop Port Forward"
+      },
+      {
+        "command": "k8sPortForwardProfiles.restartProfile",
+        "title": "Restart Port Forward"
+      },
+      {
+        "command": "k8sPortForwardProfiles.toggleProfile",
+        "title": "Toggle Port Forward"
+      },
+      {
+        "command": "k8sPortForwardProfiles.startAll",
+        "title": "Start All Port Forwards"
+      },
+      {
+        "command": "k8sPortForwardProfiles.stopAll",
+        "title": "Stop All Port Forwards"
+      },
+      {
+        "command": "k8sPortForwardProfiles.openConfig",
+        "title": "Open portforward.json"
+      },
+      {
+        "command": "k8sPortForwardProfiles.createConfig",
+        "title": "Create portforward.json"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "k8sPortForwardProfiles.refresh",
+          "when": "view == k8sPortForwardProfiles",
+          "group": "navigation"
+        },
+        {
+          "command": "k8sPortForwardProfiles.startAll",
+          "when": "view == k8sPortForwardProfiles",
+          "group": "navigation"
+        },
+        {
+          "command": "k8sPortForwardProfiles.stopAll",
+          "when": "view == k8sPortForwardProfiles",
+          "group": "navigation"
+        },
+        {
+          "command": "k8sPortForwardProfiles.openConfig",
+          "when": "view == k8sPortForwardProfiles && k8sPortForwardProfiles.hasConfig == true",
+          "group": "navigation"
+        },
+        {
+          "command": "k8sPortForwardProfiles.createConfig",
+          "when": "view == k8sPortForwardProfiles && k8sPortForwardProfiles.hasConfig == false",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "k8sPortForwardProfiles.startProfile",
+          "when": "view == k8sPortForwardProfiles && viewItem == k8sPortForwardProfiles.profile",
+          "group": "inline"
+        },
+        {
+          "command": "k8sPortForwardProfiles.stopProfile",
+          "when": "view == k8sPortForwardProfiles && viewItem == k8sPortForwardProfiles.profile",
+          "group": "inline"
+        },
+        {
+          "command": "k8sPortForwardProfiles.restartProfile",
+          "when": "view == k8sPortForwardProfiles && viewItem == k8sPortForwardProfiles.profile",
+          "group": "navigation"
+        },
+        {
+          "command": "k8sPortForwardProfiles.openConfig",
+          "when": "view == k8sPortForwardProfiles && viewItem == k8sPortForwardProfiles.profile",
+          "group": "navigation"
+        }
+      ]
+    },
+    "jsonValidation": [
+      {
+        "fileMatch": ".vscode/portforward.json",
+        "url": "./schemas/portforward.schema.json"
+      }
+    ]
+  }
+}
